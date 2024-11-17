@@ -1,52 +1,38 @@
-#include "byblik.h"
-#include <vector>
+#include "modAlphakey.h"
 
-byblik::byblik(int numColumns) : numColumns(numColumns) {}
+std::wstring modAlphakey::encrypt(const std::wstring& open_text)
+{
+    std::wstring tabl(open_text.length(), L' '); 
+    int dl = open_text.length();
+    int nstrok = (dl - 1) / key1 + 1; 
+    int x = 0;
 
-std::string byblik::encrypt(const std::string& plaintext) {
-    std::string ciphertext;
-
-    int numRows = (plaintext.length() + numColumns - 1) / numColumns;
-    std::vector<std::string> table(numRows, std::string(numColumns, ' '));
-
-    int index = 0;
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < numColumns; j++) {
-            if (index < plaintext.length()) {
-                table[i][j] = plaintext[index++];
+    for(int i = key1; i > 0; i--) { 
+        for(int j = 0; j < nstrok; j++) { 
+            int index = i + key1 * j;
+            if(index - 1 < dl) {
+                tabl[x] = open_text[index - 1];
+                x++;
             }
         }
     }
-
-    for (int j = 0; j < numColumns; j++) {
-        for (int i = 0; i < numRows; i++) {
-            ciphertext += table[i][j];
-        }
-    }
-
-    return ciphertext;
+    return tabl;
 }
 
-std::string byblik::decrypt(const std::string& ciphertext) {
-    std::string decryptedText;
+std::wstring modAlphakey::decrypt(const std::wstring& cipher_text)
+{
+    std::wstring tabl(cipher_text.length(), L' '); 
+    int dl = cipher_text.length();
+    int nstrok = (dl - 1) / key1 + 1; 
+    int x = 0;
 
-    int numRows = (ciphertext.length() + numColumns - 1) / numColumns;
-    std::vector<std::string> table(numRows, std::string(numColumns, ' '));
-
-    int index = 0;
-    for (int j = 0; j < numColumns; j++) {
-        for (int i = 0; i < numRows; i++) {
-            if (index < ciphertext.length()) {
-                table[i][j] = ciphertext[index++];
+    for(int i = key1; i > 0; i--) { 
+        for(int j = 0; j < nstrok; j++) { 
+            int index = i + key1 * j;
+            if(index - 1 < dl) {
+                tabl[index - 1] = cipher_text[x++];
             }
         }
     }
-
-    for (int i = 0; i < numRows; i++) {
-        for (int j = 0; j < numColumns; j++) {
-            decryptedText += table[i][j];
-        }
-    }
-
-    return decryptedText;
+    return tabl;
 }
